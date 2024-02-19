@@ -4,6 +4,7 @@ import statistics
 import sys 
 import matplotlib.pyplot as plt
 import numpy as np
+import cythonfn
 
 #--------------------------------- Array initialisation ---------------------
 
@@ -29,39 +30,7 @@ def get_test_arrays(array_size):
 
 #------------------------------------ Timing the operations -----------------------------------------
 # Function for running the benchmark
-def run_STREAM_average(a, b, c, scalar, array_size, n):
-    
-    times = [[] for i in range(4)]
-    
-    for i in range(n):
-        # COPY
-        times[0].append(time())
-        for j in range(len(a)):
-            c[j] = a[j]
-        times[0][-1] = time() - times[0][-1]
 
-        # ADD
-        times[2].append(time())
-        for j in range(len(a)):
-             c[j] = a[j]+b[j]
-        times[2][-1] = time() - times[2][-1]
-
-        # SCALE
-        times[1].append(time())
-        for j in range(len(a)):
-             b[j] = scalar*c[j]
-        times[1][-1] = time() - times[1][-1]
-
-        # TRIAD
-        times[3].append(time())
-        for j in range(len(a)):
-            a[j] = b[j]+scalar*c[j]
-        times[3][-1] = time() - times[3][-1]
-        
-    for t in range(4):
-        times[t] = statistics.mean(times[t])
-    
-    return times
 
 
 def get_memory_bandwidths(array_size, times_list, times_array):
@@ -85,7 +54,7 @@ def get_memory_bandwidths(array_size, times_list, times_array):
     return (get_bandwidths(data_moved_list, times_list), get_bandwidths(data_moved_array, times_array))
 
 #---------------- combined -------------
-array_sizes_to_test = [10 ** i for i in range(1,7)] + [10 ** 6 * i for i in range(2, 6)]
+array_sizes_to_test = [10 ** i for i in range(1,5)] + [10 ** 6 * i for i in range(2, 6)]
 
 results_list = []
 results_array = []
@@ -96,9 +65,12 @@ test_number = len(array_sizes_to_test)
 for size in array_sizes_to_test:
     print("Running test " + str(counter) + " out of " + str(test_number))
     a1, b1, c1, a2, b2, c2, scalar = get_test_arrays(size)
-    times_list = run_STREAM_average(a1, b1, c1, scalar, size, 100)
-    times_array = run_STREAM_average(a2, b2, c2, scalar, size, 100)
-    
+    times_list = cythonfn.run_STREAM_average_array(np.array(a1), np.array(b1), np.array(c1), scalar, size, 100)
+    for t in range(4):
+        times_list[t] = statistics.mean(times_list[t])
+    times_array = cythonfn.run_STREAM_average_array(np.array(a2), np.array(b2), np.array(c2), scalar, size, 100)
+    for t in range(4):
+        times_array[t] = statistics.mean(times_array[t])
     memory_bandwidths_list, memory_bandwidths_array = get_memory_bandwidths(size, times_list, times_array)
     
     results_list.append(memory_bandwidths_list)
@@ -129,7 +101,6 @@ def get_points_xy(operation_id, array_sizes, results):
 def plot_operation(operation_id, results, color, label):
     x, y = get_points_xy(operation_id, array_sizes_to_test, results)
     plt.scatter(x, y, color=color, marker='o', label=label)
-
 
 # plot_operation(0, results_list, 'red', 'copy list')
 plot_operation(0, results_array, 'green', 'copy array')
