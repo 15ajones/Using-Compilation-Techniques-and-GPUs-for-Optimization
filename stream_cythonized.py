@@ -54,7 +54,7 @@ def get_memory_bandwidths(array_size, times_list, times_array):
     return (get_bandwidths(data_moved_list, times_list), get_bandwidths(data_moved_array, times_array))
 
 #---------------- combined -------------
-array_sizes_to_test = [10 ** i for i in range(1,5)] + [10 ** 6 * i for i in range(2, 6)]
+array_sizes_to_test = [10 ** i for i in range(1,7)] + [10 ** 6 * i for i in range(2, 6)]
 
 results_list = []
 results_array = []
@@ -115,7 +115,7 @@ plt.show()
 # plot_operation(1, results_list, 'red', 'add list')
 plot_operation(1, results_array, 'green', 'add array')
 # plt.legend(['COPY with lists','COPY with arrays'])
-plt.legend(['COPY with arrays']) 
+plt.legend(['ADD with arrays']) 
 plt.title("ADD Comparison")
 plt.xlabel('STREAM_ARRAY_SIZE (log10 scale)')
 plt.ylabel('Memory bandwith in B/s (linear scale)')
@@ -123,9 +123,9 @@ plt.show()
 
 
 # plot_operation(2, results_list, 'red', 'add list')
-plot_operation(2, results_array, 'green', 'add array')
+plot_operation(2, results_array, 'green', 'scale array')
 # plt.legend(['SCALE with lists','SCALE with arrays']) 
-plt.legend(['COPY with arrays']) 
+plt.legend(['SCALE with arrays']) 
 plt.title("SCALE Comparison")
 plt.xlabel('STREAM_ARRAY_SIZE (log10 scale)')
 plt.ylabel('Memory bandwith (linear scale)')
@@ -133,9 +133,9 @@ plt.show()
 
 
 # plot_operation(3, results_list, 'red', 'add list')
-plot_operation(3, results_array, 'green', 'add array')
+plot_operation(3, results_array, 'green', 'triad array')
 # plt.legend(['TRIAD with lists','TRIAD with arrays']) 
-plt.legend(['COPY with arrays']) 
+plt.legend(['TRIAD with arrays']) 
 plt.title("TRIAD Comparison")
 plt.xlabel('STREAM_ARRAY_SIZE (log10 scale)')
 plt.ylabel('Memory bandwith in B/s (linear scale)')
